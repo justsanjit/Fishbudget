@@ -2,16 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Transaction;
 use Illuminate\Http\Request;
+use App\Transaction;
 
 class TransactionController extends Controller
 {
     public function index()
     {
-        $transactions = Transaction::all();
+        $transactions = auth()->user()->transactions;
 
         return view('transactions.index', compact('transactions'));
+    }
+
+    public function show(Transaction $transaction)
+    {
+        abort_if(auth()->user()->isNot($transaction->user), 403);
+
+        return view('transactions.show', compact('transaction'));
     }
 
     public function store()
@@ -20,10 +27,10 @@ class TransactionController extends Controller
             'type' => 'required',
             'amount' => 'required|gt:1',
             'description' => 'required',
-            'date' => 'required|date_format:Y-m-d'
+            'date' => 'required|date_format:Y-m-d',
         ]);
 
-        Transaction::create(request(['description', 'date', 'type', 'amount']));
+        auth()->user()->transactions()->create($attributes);
 
         return redirect('transactions');
     }

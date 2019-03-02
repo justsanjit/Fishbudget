@@ -15,6 +15,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('transactions', 'TransactionController@index');
+Route::get('transactions', 'TransactionController@index')->middleware('auth');
 
-Route::post('transactions', 'TransactionController@store');
+Route::get('transactions/{transaction}', 'TransactionController@show')->middleware('auth');
+
+Route::post('transactions', 'TransactionController@store')->middleware('auth');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
