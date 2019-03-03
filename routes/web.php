@@ -15,8 +15,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('transactions/import', 'TransactionImportController@create');
-Route::post('transactions/import', 'TransactionImportController@store')->name('transactions.import');
+Route::get('transactions/import', 'TransactionImportController@create')->middleware('auth');
+Route::post('transactions/import', 'TransactionImportController@store')->middleware('auth')->name('transactions.import');
+Route::get('transactions/import/mapping', 'ImportMappingController@create')->name('transactions.import.mapping');
 
 Route::get('transactions', 'TransactionController@index')->middleware('auth');
 Route::get('transactions/{transaction}', 'TransactionController@show')->middleware('auth');

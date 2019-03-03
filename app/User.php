@@ -40,4 +40,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(Transaction::class);
     }
+
+    /**
+     * List all the use imports
+     */
+    public function imports()
+    {
+        return $this->hasMany(Import::class);
+    }
+
+    /**
+     * In progress imports associated with the user
+     */
+    public function inprogressImports()
+    {
+        return $this->imports()->inProgress();
+    }
 }

@@ -8,11 +8,19 @@ class TransactionImportController extends Controller
 {
     public function create()
     {
+        // If any import for user in progress redirect to mapping controller
+        if (auth()->user()->imports()->inProgress()->count() > 0) {
+            return redirect()->action('ImportMappingController@create');
+        }
+
         return view('transactions.import.create');
     }
 
     public function store()
     {
+        abort_if(auth()->user()->imports()->inProgress()->count() > 0, 429);
+
+        // Validate user input
         request()->validate([
             'file' => 'required|mimes:csv,txt'
         ]);
@@ -22,8 +30,8 @@ class TransactionImportController extends Controller
         $file->store('imports', ['disk' => 'local']);
 
         // Record import in database
-        Import::create(['file' => $file->hashName()]);
+        auth()->user()->imports()->create(['file' => $file->hashName(), 'status' => 'submitted']);
 
-        return redirect()->back()->with(['success' => 'Import submitted. It will take upto 10 minutes to process it.']);
+        return redirect()->route('transactions.import.mapping');
     }
 }
